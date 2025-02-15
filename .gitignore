@@ -64,3 +64,5 @@ pnpm-debug.log*
 *.ntvs*
 *.njsproj
 *.sw?
+
+packages/

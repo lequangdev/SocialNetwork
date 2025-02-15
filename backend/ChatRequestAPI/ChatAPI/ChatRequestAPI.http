@@ -1,0 +1,6 @@
+@ChatRequestAPI_HostAddress = http://localhost:5092
+
+GET {{ChatRequestAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
