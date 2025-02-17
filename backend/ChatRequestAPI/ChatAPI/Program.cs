@@ -10,6 +10,7 @@ using Infrastructure.RabitMq.MessageBus.ConsumerService.Interface;
 using Infrastructure.RabitMq.MessageBus.ConsumerService;
 using Infrastructure.Serilog;
 using Infrastructure.Redis;
+using DataAccessLayer.EF_core;
 var builder = WebApplication.CreateBuilder(args);
 
 
