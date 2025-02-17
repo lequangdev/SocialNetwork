@@ -8,6 +8,7 @@ using MasstransitRabitMQ.contract.Abstractions.IntergrationEvents;
 using Infrastructure.Jwt;
 using Infrastructure.DependencyInjection.Options;
 using Infrastructure.Redis;
+using DataAccessLayer.EF_core;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

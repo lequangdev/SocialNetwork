@@ -23,7 +23,14 @@ namespace AuthAPI.Controllers
         private readonly IJwtService _jwtService;
         private readonly IResponseCacheService _responseCacheService;
 
-        public AuthController(IProducer producer, ISmsService smsService, ILoggingService loggingService,IJwtService jwtService, IResponseCacheService responseCacheService)
+        public AuthController 
+        (
+            IProducer producer,
+            ISmsService smsService,
+            ILoggingService loggingService,
+            IJwtService jwtService,
+            IResponseCacheService responseCacheService
+        ) 
         {
             _producer = producer;
             _smsService = smsService;
@@ -97,6 +104,8 @@ namespace AuthAPI.Controllers
             await _responseCacheService.RemoveCacheResponseAsync("/Auth/GetAll");
             return Ok();
         }
+
+
 
     }
 
