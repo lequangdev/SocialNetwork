@@ -7,7 +7,8 @@ using Domain;
 
 namespace DataAccessLayer.Interfaces
 {
-    public interface IBaseRepo
+    public interface IBaseRepo<TEntity>
     {
+        Task<List<TEntity>> GetAll();
     }
 }

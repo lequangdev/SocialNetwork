@@ -9,6 +9,10 @@ using Infrastructure.Jwt;
 using Infrastructure.DependencyInjection.Options;
 using Infrastructure.Redis;
 using DataAccessLayer.EF_core;
+using ServiceLayer.Interfaces;
+using ServiceLayer;
+using DataAccessLayer.Interfaces;
+using DataAccessLayer;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -27,7 +31,6 @@ builder.Services.AddScoped<ISmsService, SmsService>();
 
 // Config serilog
 builder.Services.AddConfigureSerilog(builder.Configuration);
-// serilog injection
 builder.Services.AddSingleton<ILoggingService, LoggingService>();
 builder.Host.UseSerilogLogging();
 
@@ -43,6 +46,10 @@ builder.Services.AddEntityFrameWorkCore(builder.Configuration);
 builder.Services.AddConfigureCache(builder.Configuration);
 // Attribute injection
 builder.Services.AddSingleton<IResponseCacheService, ResponseCacheService>();
+
+// DI multi layer
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IUserRepo, UserRepo>();
 
 builder.Services.AddAuthorization();
 var app = builder.Build();

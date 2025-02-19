@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace ServiceLayer.Interfaces
 {
-    public interface IBaseService
+    public interface IBaseService<TEntity>
     {
+        Task<List<TEntity>> GetAll();
     }
 }
