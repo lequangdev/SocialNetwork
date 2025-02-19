@@ -10,94 +10,64 @@ using Infrastructure.Serilog;
 using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Infrastructure.Redis;
+using HostBase.Controller;
+using ServiceLayer.Interfaces;
+using Domain;
 
 namespace AuthAPI.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseApi<UserEntity>
     {
         private readonly IProducer _producer;
         private readonly ISmsService _smsService;
         private readonly ILoggingService _loggingService;
         private readonly IJwtService _jwtService;
         private readonly IResponseCacheService _responseCacheService;
+        private readonly IUserService _UserService;
 
-        public AuthController(IProducer producer, ISmsService smsService, ILoggingService loggingService,IJwtService jwtService, IResponseCacheService responseCacheService)
+        public AuthController 
+        (
+            IProducer producer,
+            ISmsService smsService,
+            ILoggingService loggingService,
+            IJwtService jwtService,
+            IResponseCacheService responseCacheService,
+            IUserService UserService
+        ) : base(UserService)
         {
             _producer = producer;
             _smsService = smsService;
             _loggingService = loggingService;
             _jwtService = jwtService;
             _responseCacheService = responseCacheService;
-        }
-        [HttpPost(Name = "publish-sms-notification")]
-        public async Task<ActionResult> publishSmsNotificationEvent()
-        {
-            var smsEvent = new DomainEvent.SmsNotificationEvent()
-            {
-                Id = Guid.NewGuid(),
-                Description = "Sms description",
-                Name = "Sms notification",
-                TimeStamp = DateTime.Now,
-                TransactionId = Guid.NewGuid(),
-                Type = NotificationType.sms
-            };
-            await _producer.PublishSms(smsEvent);
-            return Accepted();
+            _UserService = UserService;
         }
 
-        [HttpPost("test")]
-        public bool TestEvent()
+        [HttpPost("InsertUser")]
+        public async Task<IActionResult> InsertUser([FromBody] UserEntity user)
         {
             try
             {
-                int x = 0;
-                int y = 10/x;
-            }
-            catch (Exception ex) {
-                _loggingService.LogError("co loi", ex);
-            }
-            return true;
-        }
-
-        [HttpPost("test2")]
-        public string TestJwt()
-        {
-            try
-            {
-                var token = _jwtService.GenerateToken("quang1", "quang", "admin");
-                return token;
+                bool result = await _UserService.InsertUser(user);
+                if (result)
+                {
+                    return Ok(new { message = "User inserted successfully" });
+                }
+                else
+                {
+                    return StatusCode(500, new { message = "Failed to insert user" });
+                }
             }
             catch (Exception ex)
             {
-                _loggingService.LogError("co loi", ex);
-                return "co loi";
+                
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+                
             }
-        }
-        [Authorize]
-        [HttpGet("secure-data")]
-        public IActionResult GetSecureData()
-        {
-            return Ok(new { Message = "Bạn đã xác thực thành công!" });
-        }
 
-        [HttpGet("GetAll")]
-        [Cache(100)]
-        public async Task<IActionResult> Get(string keyword, int pageIndex, int pageSize)
-        {
-            var result = "quang";
-            return Ok(result);
-        }
-
-        [HttpGet("Created")]
-        [Cache(100)]
-        public async Task<IActionResult> Created()
-        {
-            await _responseCacheService.RemoveCacheResponseAsync("/Auth/GetAll");
-            return Ok();
         }
 
     }
-
 }

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.DependencyInjection.Options
+namespace DataAccessLayer.EF_core
 {
     public record EntityFrameWorkConfiguration
     {
-        public string? DefaultConnection {  get; set; }
+        public string? DefaultConnection { get; set; }
     }
 }
