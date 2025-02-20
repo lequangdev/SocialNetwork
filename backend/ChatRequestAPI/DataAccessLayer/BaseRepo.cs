@@ -29,6 +29,75 @@ namespace DataAccessLayer
             }
             return tableName;
         }
+
+        public async Task<bool> Insert(List<TEntity> model)
+        {
+            try
+            {
+                if (model == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    await _context.Set<TEntity>().AddRangeAsync(model);
+                    int rowsAffected = await _context.SaveChangesAsync();
+                    return rowsAffected > 0;
+                }
+            }
+            catch (Exception ex) 
+            {
+                return false;
+            }
+        }
+        public async Task<bool> UpdateByID(TEntity model, Guid ID)
+        {
+            try
+            {
+                var existingEntity = await _context.Set<TEntity>().FindAsync(ID);
+                if (existingEntity == null)
+                    return false;
+
+                foreach (var property in typeof(TEntity).GetProperties())
+                {
+                    var newValue = property.GetValue(model);
+                    if (newValue != null)
+                    {
+                        property.SetValue(existingEntity, newValue);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteByID(Guid ID)
+        {
+            try
+            {
+                var Model = await _context.Set<TEntity>().FindAsync(ID);
+                if (Model == null)
+                {
+                    return false; 
+                }
+                else
+                {
+                    _context.Set<TEntity>().Remove(Model);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }    
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
         public async Task<List<TEntity>> GetAll()
         {
             try

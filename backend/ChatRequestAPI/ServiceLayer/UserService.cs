@@ -20,6 +20,7 @@ namespace ServiceLayer
         {
             try
             {
+                user.user_id = Guid.NewGuid();
                 var result = await _UserRepo.InsertUser(user);
                 return result;
             }
