@@ -7,8 +7,8 @@ using Domain;
 
 namespace DataAccessLayer.Interfaces
 {
-    public interface IUserRepo
+    public interface IUserRepo : IBaseRepo<UserEntity>
     {
-        Task<bool> Insert(UserEntity user);
+        Task<bool> InsertUser(UserEntity user);
     }
 }

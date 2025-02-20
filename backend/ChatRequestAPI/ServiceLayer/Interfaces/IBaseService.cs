@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace ServiceLayer.Interfaces
 {
-    public interface IBaseService
+    public interface IBaseService<TEntity>
     {
+        Task<bool> Insert(List<TEntity> model);
+        Task<bool> UpdateByID(TEntity model, Guid ID);
+        Task<bool> DeleteByID(Guid ID);
+        Task<List<TEntity>> GetAll();
     }
 }

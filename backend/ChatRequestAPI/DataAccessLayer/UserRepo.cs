@@ -6,22 +6,24 @@ using System.Threading.Tasks;
 using DataAccessLayer.EF_core;
 using DataAccessLayer.Interfaces;
 using Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer
 {
-    public class UserRepo : IUserRepo
+    public class UserRepo :BaseRepo<UserEntity>, IUserRepo
     {
         private readonly AppDbContext _context;
-        UserRepo(AppDbContext context)
+        public UserRepo(AppDbContext context) : base(context)
         {
             _context = context;
         }
-        public async Task<bool> Insert(UserEntity user)
+        public async Task<bool> InsertUser(UserEntity user)
         {
             try
             {
-                _context.user.AddAsync(user);
-                return true;
+                await _context.user.AddAsync(user);
+                int rowsAffected = await _context.SaveChangesAsync();
+                return rowsAffected > 0;
             }
             catch
             {
