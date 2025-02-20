@@ -21,7 +21,7 @@ namespace DataAccessLayer
         {
             try
             {
-                _context.user.AddAsync(user);
+                await _context.user.AddAsync(user);
                 int rowsAffected = await _context.SaveChangesAsync();
                 return rowsAffected > 0;
             }

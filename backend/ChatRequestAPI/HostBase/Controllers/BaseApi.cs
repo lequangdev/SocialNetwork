@@ -20,11 +20,61 @@ namespace HostBase.Controller
             _service = service;
         }
 
+        [HttpPost()]
+        public virtual async Task<IActionResult> Insert([FromBody]List<TEntity> model)
+        {
+            try
+            {
+                var res = await _service.Insert(model);
+                return Ok(res);
+            }
+            catch (Exception ex) 
+            {
+                return Ok(false);
+            }
+        }
+
+        [HttpPut("UpdateByID")]
+        public virtual async Task<IActionResult> UpdateByID([FromBody] TEntity model, Guid ID)
+        {
+            try
+            {
+                var res = await _service.UpdateByID(model, ID);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return Ok(false);
+            }
+        }
+
+        [HttpDelete("DeleteByID")]
+        public virtual async Task<IActionResult> DeleteByID([FromBody] Guid ID)
+        {
+            try
+            {
+                var res = await _service.DeleteByID(ID);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return Ok(false);
+            }
+        }
+
         [HttpGet("GetAll")]
         public virtual async Task<IActionResult> GetAll()
         {
-            var res = await _service.GetAll();
-            return Ok(res);
+            try
+            {
+                var res = await _service.GetAll();
+                return Ok(res);
+            }
+            catch (Exception ex) 
+            {
+                return Ok(ex);
+            }
         }
+
     }
 }
