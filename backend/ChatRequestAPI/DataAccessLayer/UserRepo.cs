@@ -19,16 +19,9 @@ namespace DataAccessLayer
         }
         public async Task<bool> InsertUser(UserEntity user)
         {
-            try
-            {
-                await _context.user.AddAsync(user);
-                int rowsAffected = await _context.SaveChangesAsync();
-                return rowsAffected > 0;
-            }
-            catch
-            {
-                return false;
-            }
+            await _context.user.AddAsync(user);
+            int rowsAffected = await _context.SaveChangesAsync();
+            return rowsAffected > 0;
         }
     }
 }

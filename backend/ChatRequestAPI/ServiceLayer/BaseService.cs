@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataAccessLayer.EF_core;
 using DataAccessLayer.Interfaces;
 using ServiceLayer.Interfaces;
 
@@ -11,10 +12,12 @@ namespace ServiceLayer
     public abstract class BaseService<TEntity> : IBaseService<TEntity>
     {
         IBaseRepo<TEntity> _repo;
+        private readonly AppDbContext _context;
         string _tableName = "";
-        public BaseService(IBaseRepo<TEntity> repo)
+        public BaseService(IBaseRepo<TEntity> repo, AppDbContext context)
         {
             _repo = repo;
+            _context = context;
             _tableName = GetTableName(typeof(TEntity).Name);
         }
         public static string GetTableName(string tableName)
@@ -27,57 +30,29 @@ namespace ServiceLayer
             return tableName;
         }
 
-        public async Task<bool> Insert(List<TEntity> model)
+        public virtual async Task<bool> Insert(List<TEntity> model)
         {
-            try
-            {
-                var result = await _repo.Insert(model);
-                return result;
-            }
-            catch (Exception ex) 
-            {
-                return false;
-            }
+            var result = await _repo.Insert(model);
+            return result;
         }
 
-        public async Task<bool> UpdateByID(TEntity model, Guid ID)
+        public virtual async Task<bool> UpdateByID(TEntity model, Guid ID)
         {
-            try
-            {
-                var result = await _repo.UpdateByID(model, ID);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            var result = await _repo.UpdateByID(model, ID);
+            return result;
         }
 
 
-        public async Task<bool> DeleteByID(Guid ID)
+        public virtual async Task<bool> DeleteByID(Guid ID)
         {
-            try
-            {
-                var result = await _repo.DeleteByID(ID);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            var result = await _repo.DeleteByID(ID);
+            return result;
         }
 
-        public async Task<List<TEntity>> GetAll()
+        public virtual async Task<List<TEntity>> GetAll()
         {
-            try
-            {
-                var result = await _repo.GetAll();
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return new List<TEntity>();
-            }
+            var result = await _repo.GetAll();
+            return result;
         }
 
     }

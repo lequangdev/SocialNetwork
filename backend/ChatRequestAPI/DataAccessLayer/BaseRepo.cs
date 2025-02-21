@@ -30,85 +30,58 @@ namespace DataAccessLayer
             return tableName;
         }
 
-        public async Task<bool> Insert(List<TEntity> model)
+        public virtual async Task<bool> Insert(List<TEntity> model)
         {
-            try
-            {
-                if (model == null)
-                {
-                    return false;
-                }
-                else
-                {
-                    await _context.Set<TEntity>().AddRangeAsync(model);
-                    int rowsAffected = await _context.SaveChangesAsync();
-                    return rowsAffected > 0;
-                }
-            }
-            catch (Exception ex) 
+            if (model == null)
             {
                 return false;
             }
-        }
-        public async Task<bool> UpdateByID(TEntity model, Guid ID)
-        {
-            try
+            else
             {
-                var existingEntity = await _context.Set<TEntity>().FindAsync(ID);
-                if (existingEntity == null)
-                    return false;
+                await _context.Set<TEntity>().AddRangeAsync(model);
+                int rowsAffected = await _context.SaveChangesAsync();
+                return rowsAffected > 0;
+            }
+        }
+        public virtual async Task<bool> UpdateByID(TEntity model, Guid ID)
+        {
+            var existingEntity = await _context.Set<TEntity>().FindAsync(ID);
+            if (existingEntity == null)
+            { return false; }
 
-                foreach (var property in typeof(TEntity).GetProperties())
+            foreach (var property in typeof(TEntity).GetProperties())
+            {
+                var newValue = property.GetValue(model);
+                if (newValue != null)
                 {
-                    var newValue = property.GetValue(model);
-                    if (newValue != null)
-                    {
-                        property.SetValue(existingEntity, newValue);
-                    }
+                    property.SetValue(existingEntity, newValue);
                 }
+            }
 
+            await _context.SaveChangesAsync();
+            return true;
+
+        }
+
+        public virtual async Task<bool> DeleteByID(Guid ID)
+        {
+            var Model = await _context.Set<TEntity>().FindAsync(ID);
+            if (Model == null)
+            {
+                return false; 
+            }
+            else
+            {
+                _context.Set<TEntity>().Remove(Model);
                 await _context.SaveChangesAsync();
                 return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            }    
         }
 
-        public async Task<bool> DeleteByID(Guid ID)
+        public virtual async Task<List<TEntity>> GetAll()
         {
-            try
-            {
-                var Model = await _context.Set<TEntity>().FindAsync(ID);
-                if (Model == null)
-                {
-                    return false; 
-                }
-                else
-                {
-                    _context.Set<TEntity>().Remove(Model);
-                    await _context.SaveChangesAsync();
-                    return true;
-                }    
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
-        public async Task<List<TEntity>> GetAll()
-        {
-            try
-            {
-                var result = await _context.Set<TEntity>().ToListAsync();
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return new List<TEntity>();
-            }
+            var result = await _context.Set<TEntity>().ToListAsync();
+            return result;
         }
     }
 }
