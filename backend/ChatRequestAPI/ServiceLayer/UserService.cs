@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataAccessLayer.EF_core;
 using DataAccessLayer.Interfaces;
 using Domain;
 using ServiceLayer.Interfaces;
@@ -12,22 +13,18 @@ namespace ServiceLayer
     public class UserService : BaseService<UserEntity>, IUserService
     {
         private readonly IUserRepo _UserRepo;
-        public UserService(IUserRepo UserRepo) : base(UserRepo)
+        private readonly AppDbContext _context;
+
+        public UserService(IUserRepo UserRepo, AppDbContext context) : base(UserRepo, context)
         {
             _UserRepo = UserRepo;
+            _context = context;
         }
         public async Task<bool> InsertUser(UserEntity user)
         {
-            try
-            {
-                user.user_id = Guid.NewGuid();
-                var result = await _UserRepo.InsertUser(user);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            user.user_id = Guid.NewGuid();
+            var result = await _UserRepo.InsertUser(user);
+            return result;
         }
     }
 }
