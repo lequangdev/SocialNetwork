@@ -10,5 +10,7 @@ namespace DataAccessLayer.Interfaces
     public interface IUserRepo : IBaseRepo<UserEntity>
     {
         Task<bool> InsertUser(UserEntity user);
+        Task<UserEntity> LoginUser(string user_account);
+        Task<List<UserEntity>> GetUserByFullname(string payload);
     }
 }

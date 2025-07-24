@@ -10,18 +10,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer
 {
-    public class UserRepo :BaseRepo<UserEntity>, IUserRepo
+    public class UserRepo : BaseRepo<UserEntity>, IUserRepo
     {
-        private readonly AppDbContext _context;
-        public UserRepo(AppDbContext context) : base(context)
+        public UserRepo(AppDbContext dbContext) : base(dbContext)
         {
-            _context = context;
+
         }
         public async Task<bool> InsertUser(UserEntity user)
         {
-            await _context.user.AddAsync(user);
-            int rowsAffected = await _context.SaveChangesAsync();
+            await _dbContext.user.AddAsync(user);
+            int rowsAffected = await _dbContext.SaveChangesAsync();
             return rowsAffected > 0;
         }
+        public async Task<UserEntity> LoginUser(string user_account)
+        {
+            var result = await _dbContext.user.FirstOrDefaultAsync(e => e.user_account == user_account);
+            return result!;
+        }
+        public async Task<List<UserEntity>> GetUserByFullname(string payload)
+        {
+            return await _dbContext.user.Where(u => EF.Functions.Like(u.user_fullName, $"%{payload}%")).ToListAsync();
+        }
+
     }
 }

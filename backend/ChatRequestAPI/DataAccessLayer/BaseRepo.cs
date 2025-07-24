@@ -13,11 +13,11 @@ namespace DataAccessLayer
 {
     public abstract class BaseRepo<TEntity> : IBaseRepo<TEntity> where TEntity : class
     {
-        private readonly AppDbContext _dbcontext;
+        protected readonly AppDbContext _dbContext;
         string _tableName = "";
-        public BaseRepo(AppDbContext dbcontext)
+        public BaseRepo(AppDbContext dbContext)
         {
-            _dbcontext = dbcontext;
+            _dbContext = dbContext;
             _tableName = GetTableName(typeof(TEntity).Name);
         }
         public static string GetTableName(string tableName)
@@ -38,14 +38,21 @@ namespace DataAccessLayer
             }
             else
             {
-                await _dbcontext.Set<TEntity>().AddRangeAsync(model);
-                int rowsAffected = await _dbcontext.SaveChangesAsync();
-                return rowsAffected > 0;
+                try
+                {
+                    await _dbContext.Set<TEntity>().AddRangeAsync(model);
+                    int rowsAffected = await _dbContext.SaveChangesAsync();
+                    return rowsAffected > 0;
+                }
+                catch(Exception ex)
+                {
+                    return false;
+                }
             }
         }
         public virtual async Task<bool> UpdateByID(TEntity model, Guid ID)
         {
-            var existingEntity = await _dbcontext.Set<TEntity>().FindAsync(ID);
+            var existingEntity = await _dbContext.Set<TEntity>().FindAsync(ID);
             if (existingEntity == null)
             { return false; }
 
@@ -58,30 +65,36 @@ namespace DataAccessLayer
                 }
             }
 
-            await _dbcontext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             return true;
 
         }
 
         public virtual async Task<bool> DeleteByID(Guid ID)
         {
-            var Model = await _dbcontext.Set<TEntity>().FindAsync(ID);
+            var Model = await _dbContext.Set<TEntity>().FindAsync(ID);
             if (Model == null)
             {
                 return false; 
             }
             else
             {
-                _dbcontext.Set<TEntity>().Remove(Model);
-                await _dbcontext.SaveChangesAsync();
+                _dbContext.Set<TEntity>().Remove(Model);
+                await _dbContext.SaveChangesAsync();
                 return true;
             }    
         }
 
         public virtual async Task<List<TEntity>> GetAll()
         {
-            var result = await _dbcontext.Set<TEntity>().ToListAsync();
+            var result = await _dbContext.Set<TEntity>().ToListAsync();
             return result;
+        }
+
+        public async Task<TEntity> GetByID(Guid ID)
+        {
+            var result = await _dbContext.Set<TEntity>().FindAsync(ID);
+            return result!;
         }
     }
 }
