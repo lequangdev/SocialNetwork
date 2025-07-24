@@ -76,5 +76,19 @@ namespace HostBase.Controller
             }
         }
 
+        [HttpGet("GetByID")]
+        public virtual async Task<IActionResult> GetByID([FromHeader]Guid ID)
+        {
+            try
+            {
+                var res = await _service.GetByID(ID);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return Ok(ex);
+            }
+        }
+
     }
 }

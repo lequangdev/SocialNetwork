@@ -13,6 +13,7 @@ using System.Text;
 using System;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
+using System.Security.Claims;
 
 
 
@@ -108,7 +109,39 @@ namespace Infrastructure.DependencyInjection.Extentions
                     ValidAudience = jwtConfiguration.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.SecretKey))
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        // SignalR gửi access_token qua query string chứ không phải Authorization header
+                        var accessToken = context.Request.Query["access_token"];
+
+                        // Kiểm tra nếu đường dẫn là đến Hub (tuỳ vào endpoint của bạn)
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chatHub"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    },
+
+                    OnTokenValidated = context =>
+                    {
+                        // Gán ClaimTypes.NameIdentifier để SignalR biết user là ai
+                        var claimsIdentity = context.Principal.Identity as ClaimsIdentity;
+                        var userId = claimsIdentity.FindFirst("user_id")?.Value;
+
+                        if (!string.IsNullOrEmpty(userId))
+                        {
+                            claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId));
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
+
             return services;
         }
         // Redis cache

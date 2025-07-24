@@ -13,12 +13,14 @@ using Infrastructure.Redis;
 using HostBase.Controller;
 using ServiceLayer.Interfaces;
 using Domain;
+using DTO;
+using System.Collections.Generic;
 
 namespace AuthAPI.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
-    public class AuthController : BaseApi<UserEntity>
+    public class AuthUserController : BaseApi<UserEntity>
     {
         private readonly IProducer _producer;
         private readonly ISmsService _smsService;
@@ -27,7 +29,7 @@ namespace AuthAPI.Controllers
         private readonly IResponseCacheService _responseCacheService;
         private readonly IUserService _UserService;
 
-        public AuthController 
+        public AuthUserController 
         (
             IProducer producer,
             ISmsService smsService,
@@ -68,6 +70,57 @@ namespace AuthAPI.Controllers
             }
 
         }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> LoginUser([FromBody] LoginDTO request)
+        {
+            try
+            {
+                UserEntity result = await _UserService.LoginUser(request.user_account!, request.user_password!);
+                if (result != null)
+                {
+                    
+                    var token = _jwtService.GenerateUserToken(result.user_id);
+                    var response = new
+                    {
+                        Token = token,
+                        User = result 
+                    };
+                    return Ok(response);
+                }
+                else
+                {
+                    return StatusCode(500, new { message = "Tài khoản hoặc mất khẩu không chính xác" });
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+
+            }
+
+        }
+
+        [HttpGet("GetUserByFullname")]
+        public async Task<IActionResult> GetUserByFullname([FromHeader] string payload)
+        {
+            try
+            {
+                var result = await _UserService.GetUserByFullname(payload);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+
+            }
+
+        }
+
+        
+
+
 
     }
 }

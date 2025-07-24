@@ -1,4 +1,4 @@
-using Infrastructure;
+﻿using Infrastructure;
 using Infrastructure.DependencyInjection.Extentions;
 using Infrastructure.RabitMq.MessageBus.ConsumerService.Interface;
 using Infrastructure.RabitMq.MessageBus.ConsumerService;
@@ -15,7 +15,17 @@ using DataAccessLayer.Interfaces;
 using DataAccessLayer;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Configure CORS ( cho phép gửi request )
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", builder =>
+    {
+        builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost");
+        builder.AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials(); ;
+    });
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -50,6 +60,8 @@ builder.Services.AddSingleton<IResponseCacheService, ResponseCacheService>();
 // DI multi layer
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IUserRepo, UserRepo>();
+builder.Services.AddTransient<IFriendshipService, FriendshipService>();
+builder.Services.AddTransient<IFriendshipRepo, FriendshipRepo>();
 
 builder.Services.AddAuthorization();
 var app = builder.Build();
@@ -61,7 +73,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+// Enable CORS
+app.UseCors("AllowSpecificOrigin");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

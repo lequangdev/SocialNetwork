@@ -13,11 +13,11 @@ namespace DataAccessLayer
 {
     public abstract class BaseRepo<TEntity> : IBaseRepo<TEntity> where TEntity : class
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _dbcontext;
         string _tableName = "";
-        public BaseRepo(AppDbContext context)
+        public BaseRepo(AppDbContext dbcontext)
         {
-            _context = context;
+            _dbcontext = dbcontext;
             _tableName = GetTableName(typeof(TEntity).Name);
         }
         public static string GetTableName(string tableName)
@@ -38,14 +38,14 @@ namespace DataAccessLayer
             }
             else
             {
-                await _context.Set<TEntity>().AddRangeAsync(model);
-                int rowsAffected = await _context.SaveChangesAsync();
+                await _dbcontext.Set<TEntity>().AddRangeAsync(model);
+                int rowsAffected = await _dbcontext.SaveChangesAsync();
                 return rowsAffected > 0;
             }
         }
         public virtual async Task<bool> UpdateByID(TEntity model, Guid ID)
         {
-            var existingEntity = await _context.Set<TEntity>().FindAsync(ID);
+            var existingEntity = await _dbcontext.Set<TEntity>().FindAsync(ID);
             if (existingEntity == null)
             { return false; }
 
@@ -58,29 +58,29 @@ namespace DataAccessLayer
                 }
             }
 
-            await _context.SaveChangesAsync();
+            await _dbcontext.SaveChangesAsync();
             return true;
 
         }
 
         public virtual async Task<bool> DeleteByID(Guid ID)
         {
-            var Model = await _context.Set<TEntity>().FindAsync(ID);
+            var Model = await _dbcontext.Set<TEntity>().FindAsync(ID);
             if (Model == null)
             {
                 return false; 
             }
             else
             {
-                _context.Set<TEntity>().Remove(Model);
-                await _context.SaveChangesAsync();
+                _dbcontext.Set<TEntity>().Remove(Model);
+                await _dbcontext.SaveChangesAsync();
                 return true;
             }    
         }
 
         public virtual async Task<List<TEntity>> GetAll()
         {
-            var result = await _context.Set<TEntity>().ToListAsync();
+            var result = await _dbcontext.Set<TEntity>().ToListAsync();
             return result;
         }
     }

@@ -11,6 +11,11 @@ using Infrastructure.RabitMq.MessageBus.ConsumerService;
 using Infrastructure.Serilog;
 using Infrastructure.Redis;
 using DataAccessLayer.EF_core;
+using ServiceLayer.Interfaces;
+using ServiceLayer;
+using ChatAPI;
+using DataAccessLayer.Interfaces;
+using DataAccessLayer;
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -26,6 +31,16 @@ builder.Services.AddCors(options =>
                .AllowCredentials(); ;
     });
 });
+
+// DI services
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IMessageRepo, MessageRepo>();
+builder.Services.AddScoped<IRoom_UserService, Room_UserService>();
+builder.Services.AddScoped<IRoom_chatRepo, Room_chatRepo>();
+builder.Services.AddScoped<IRoom_userRepo, Room_userRepo>();
+builder.Services.AddScoped<IFriendshipService, FriendshipService>();
+builder.Services.AddScoped<IFriendshipRepo, FriendshipRepo>();
+
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -60,6 +75,8 @@ builder.Services.AddConfigureCache(builder.Configuration);
 // Attribute injection
 builder.Services.AddSingleton<IResponseCacheService, ResponseCacheService>();
 
+
+
 builder.Services.AddAuthorization();
 var app = builder.Build();
 
@@ -91,6 +108,6 @@ app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-app.MapHub<ChatHub>("/chatHub"); 
+app.MapHub<MessageHub>("/chatHub"); 
 
 app.Run();
