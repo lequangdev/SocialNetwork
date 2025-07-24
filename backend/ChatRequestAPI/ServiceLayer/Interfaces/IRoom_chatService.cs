@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain;
 
-namespace Infrastructure.Jwt
+namespace ServiceLayer.Interfaces
 {
-    public interface IJwtService
+    public interface IRoom_chatService : IBaseService<Room_chatEntity>
     {
-        string GenerateUserToken(Guid? user_id);
     }
 }

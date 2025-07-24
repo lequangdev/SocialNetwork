@@ -19,15 +19,13 @@ namespace Infrastructure.Jwt
         {
             _jwtConfiguration = jwtConfiguration.Value;
         }
-        public string GenerateToken(string user_id, string userName, string role)
+        public string GenerateUserToken(Guid? user_id)
         {
             var claims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user_id),
-            new Claim(JwtRegisteredClaimNames.UniqueName, userName),
-            new Claim(ClaimTypes.Role, role),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user_id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.SecretKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

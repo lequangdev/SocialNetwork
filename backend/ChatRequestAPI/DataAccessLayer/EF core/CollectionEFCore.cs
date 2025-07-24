@@ -18,7 +18,7 @@ namespace DataAccessLayer.EF_core
             var jwtConfiguration = configuration.GetSection(nameof(EntityFrameWorkConfiguration)).Get<EntityFrameWorkConfiguration>();
             services.AddDbContext<AppDbContext>(options =>
                 options.UseMySql(
-                    jwtConfiguration.DefaultConnection,
+                    jwtConfiguration!.DefaultConnection,
                     new MySqlServerVersion(new Version(8, 0, 29))
                 )
             );

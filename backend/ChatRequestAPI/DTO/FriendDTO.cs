@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Jwt
+namespace DTO
 {
-    public interface IJwtService
+    public class FriendDTO
     {
-        string GenerateUserToken(Guid? user_id);
+        public Guid? user_id { get; set; }
+        public Guid? friend_id { get; set; }
     }
 }

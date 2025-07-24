@@ -13,6 +13,6 @@ namespace DataAccessLayer.Interfaces
         Task<bool> UpdateByID(TEntity model, Guid ID);
         Task<bool> DeleteByID(Guid ID);
         Task<List<TEntity>> GetAll();
-
+        Task<TEntity> GetByID(Guid ID);
     }
 }

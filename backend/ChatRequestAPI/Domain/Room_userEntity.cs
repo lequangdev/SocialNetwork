@@ -8,22 +8,21 @@ using System.Threading.Tasks;
 
 namespace Domain
 {
-    public class UserEntity
+    public class Room_userEntity
     {
         [Key]
+        public Guid? room_user_id { get; set; }
+        public Guid? room_id  { get; set;}
         public Guid? user_id {  get; set; }
-        public string? user_fullName { get; set; }
-        public string? phone_number { get; set; }
-        public string? user_account { get; set; }
-        public string? user_password { get; set; }
-        public string? user_avatar { get; set; }
         public string? created_by { get; set; }
         public DateTime? created_at { get; set; }
         public string? modified_by { get; set; }
         public DateTime? modified_at { get; set; }
 
-        [ForeignKey("room_user_id")]
-        public ICollection<Room_userEntity>? Room_user { get; set; }
-
+        [ForeignKey("room_id")]
+        public Room_chatEntity? room_chat { get; set; }
+        [ForeignKey("user_id")]
+        public UserEntity? user { get; set; }        
     }
 }
+
